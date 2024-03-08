@@ -1,0 +1,29 @@
+---
+- name: Configuring apache
+  hosts: all
+  tasks:
+   - name: Install tomcat9
+     apt:
+      name: apache2
+      state: present
+      update_cache: yes
+   - name: Edit the idnex.html file
+     copy:
+      content: "IntelliQIT"
+      dest: /var/www/html/index.html
+   - name: Restart apache2
+     service:
+      name: apache2
+      state: restarted
+   - name: pause for 2 minutes
+     pause:
+      minutes: 4
+   - name: Check apache2 url response
+     uri:
+      url: "{{item}}"
+      status_code: 200
+     with_items:
+      - http://54.237.145.196
+      - http://52.23.229.63
+...
+
