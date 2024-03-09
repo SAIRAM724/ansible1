@@ -1,29 +1,36 @@
 ---
-- name: Configuring apache
+- name: Configuring tomcat9
   hosts: all
   tasks:
-   - name: Install tomcat9
-     apt:
-      name: apache2
-      state: present
-      update_cache: yes
-   - name: Edit the idnex.html file
-     copy:
-      content: "IntelliQIT"
-      dest: /var/www/html/index.html
-   - name: Restart apache2
-     service:
-      name: apache2
-      state: restarted
-   - name: pause for 2 minutes
-     pause:
-      minutes: 4
-   - name: Check apache2 url response
-     uri:
-      url: "{{item}}"
-      status_code: 200
-     with_items:
-      - http://54.237.145.196
-      - http://52.23.229.63
+    - name: Install tomcat9 and tomcat9-admin
+      apt:
+        name: "{{item.a}}"
+        state: "{{item.b}}"
+        update_cache: "{{item.c}}"
+      with_items:
+        - {a: tomcat9,b: present,c: yes}
+        - {a: tomcat9-admin,b: present,c: no}
+    - name: Copy tomcat-users.xml
+      copy:
+        src: tomcat-users.xml
+        dest: /etc/tomcat9
+    - name: Change port of tomcat from 8080 to 9090
+      replace:
+        regexp: 8080
+        replace: 9090
+        path: /etc/tomcat9/server.xml
+    - name: Restart tomcat9
+      service:
+        name: tomcat9
+        state: restarted
+    - name: Pause for 1 min
+      pause:
+        minutes: 1
+    - name: Check tomcat on all servers
+      uri:
+        url: "{{item}}"
+        status_code: 200
+      with_items:
+        - http://172.31.92.36:9090
+        - http://172.31.86.20:9090
 ...
-
