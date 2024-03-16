@@ -1,0 +1,9 @@
+---
+- name: Create 10 nginx contianers fro laodbalancing
+  hosts: all
+  tasks:
+    - name: Create 10 containers
+      docker_container:
+        name: "container{{item}}"
+        image: nginx
+      with_sequence: count=10
